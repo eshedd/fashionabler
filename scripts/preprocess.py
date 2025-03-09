@@ -1,13 +1,12 @@
 import os
 from rembg import remove, new_session
 
-
+print('Creating rembg session...')
 session = new_session()
 
-# Batch process all images in a directory
+print('Segmenting images...')
 input_dir = "imgs/flatlay/"
 output_dir = "imgs/segmented/"
-
 for img_file in os.listdir(input_dir):
     print(img_file)
     input_path = os.path.join(input_dir, img_file)
