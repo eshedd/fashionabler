@@ -1,4 +1,4 @@
-# Fashionabler
+# Fashionabler 👖
 A smart clothing recommender for my fashion-incompetent self built with [FashionCLIP](https://github.com/patrickjohncyh/fashion-clip).
 
 ## Installation
