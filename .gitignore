@@ -1,3 +1,5 @@
 .venv/
-imgs/flatlay/*
-imgs/segmented/*
+imgs/*
+old/*
+.DS_Store
+**/.DS_Store
