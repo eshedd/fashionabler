@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Wardrobe</title>
+    <style>
+        body { font-family: Arial; }
+        .clothing-item { display: inline-block; margin: 10px; text-align: center; }
+        img { width: 150px; height: 150px; object-fit: cover; }
+    </style>
+</head>
+<body>
+    <h1>My Wardrobe</h1>
+    <div>
+        {% for item in clothes %}
+        <div class="clothing-item">
+            <img src="/static/images/{{ item.image_path }}" alt="{{ item.id }}">
+            <p>{{ item.id }} {{ item.tags }} ({{ item.status }})</p>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
