@@ -29,7 +29,7 @@ def encode_images(fclip, image_dir, batch_size):
     return images, image_embeddings
 
 
-def save_embeddings(images, embeddings):
+def save_embeddings(images, embeddings, json_file):
     '''
     Save image embeddings to json file
 
@@ -37,7 +37,7 @@ def save_embeddings(images, embeddings):
         images (list): list of image paths
         embeddings (np.array): image embeddings
     '''
-    with open('metadata.json', 'r+') as f:
+    with open(json_file, 'r+') as f:
         metadata = json.load(f)
         for idx, image in enumerate(images):
             try:
@@ -72,4 +72,4 @@ if __name__ == '__main__':
     fclip = FashionCLIP('fashion-clip')
 
     images, image_embeddings = encode_images(fclip, args.dir, args.batch)
-    save_embeddings(images, image_embeddings)
+    save_embeddings(images, image_embeddings, json_file='imgs/metadata.json')
