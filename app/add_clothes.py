@@ -5,6 +5,9 @@ import shutil
 from tags import ALL_CATEGORIES
 from PIL import Image, ImageTk
 
+"""
+GUI tool to add clothes to the database with manual tagging.
+"""
 
 def main(session):
     root = tk.Tk()
