@@ -30,6 +30,12 @@ class ClothingItem(Base):
     tags = Column(String)
     status = Column(Enum(StatusEnum), default=StatusEnum.clean)
 
+    def __init__(self, image_path, tags="", status=StatusEnum.clean):
+        self.image_path = image_path
+        self.id = int(image_path.split("_")[0])  # numeric prefix
+        self.tags = tags
+        self.status = status
+
 Base.metadata.create_all(engine)
 
 # --- FastAPI setup ---
