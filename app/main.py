@@ -10,6 +10,7 @@ from starlette.middleware.sessions import SessionMiddleware
 import os
 from scripts.entropy import next_category
 from scripts.utils import get_available_clothes
+from scripts.encode_text import prompt_outfit
 
 
 # --- Database setup ---
@@ -168,16 +169,28 @@ def do_laundry():
     return RedirectResponse(url="/select", status_code=303)
 
 @app.route("/outfit", methods=["GET", "POST"])
-def prompt_search():
+async def prompt_search(request: Request):
     session_state = request.session.get("filter_state", {})
     remaining_ids = session_state.get("remaining_ids", None)
-    clothes_dicts = get_available_clothes(session_state["remaining_ids"])
+
+    clothes_dicts = get_available_clothes(remaining_ids)
 
     results = []
     prompt = ""
 
+    outfit_ids = []
     if request.method == "POST":
-        prompt = request.form.get("prompt", "")
-        outfit_ids = black_box_matching_function(prompt)
-    session_state["remaining_ids"] = outfit_ids
-    return RedirectResponse(url="/select", status_code=303)
+        form = await request.form()
+        prompt = form.get("prompt", "")
+        outfit_ids, outfit_scores = prompt_outfit(prompt)
+        print(outfit_scores)
+        session_state["remaining_ids"] = outfit_ids
+        request.session["filter_state"] = session_state
+        return RedirectResponse(url="/select", status_code=303)
+    else:
+        return templates.TemplateResponse("outfit.html", {
+            "request": request,
+            "prompt": prompt,
+            "results": results,
+            "clothes": clothes_dicts,
+        })

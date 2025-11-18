@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search by Prompt</title>
+    <style>
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+        .item {
+            width: 120px;
+            height: 160px;
+            overflow: hidden;
+            border-radius: 8px;
+            border: 2px solid #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .item img {
+            width: 100%;
+            height: auto;
+        }
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        input[type="text"] {
+            width: 320px;
+            padding: 10px;
+        }
+        button {
+            padding: 10px 16px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Search Clothes via Prompt</h2>
+
+    <form method="POST">
+        <input type="text" name="prompt" placeholder="Describe an outfit..." value="{{ prompt }}">
+        <button type="submit">Run</button>
+    </form>
+
+    <hr>
+
+    {% if clothes|length == 0 and prompt != "" %}
+        <p>No matching clothing found.</p>
+    {% endif %}
+
+    <div class="grid">
+        {% for item in clothes %}
+        <div class="item">
+            <img src="/static/images/{{ item.image_path }}" alt="{{ item.id }}">
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
