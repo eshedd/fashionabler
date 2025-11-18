@@ -8,7 +8,8 @@ import enum
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 import os
-from app.entropy import next_category, get_available_clothes
+from scripts.entropy import next_category
+from scripts.utils import get_available_clothes
 
 
 # --- Database setup ---
@@ -164,4 +165,19 @@ def do_laundry():
     )
     session.commit()
     session.close()
+    return RedirectResponse(url="/select", status_code=303)
+
+@app.route("/outfit", methods=["GET", "POST"])
+def prompt_search():
+    session_state = request.session.get("filter_state", {})
+    remaining_ids = session_state.get("remaining_ids", None)
+    clothes_dicts = get_available_clothes(session_state["remaining_ids"])
+
+    results = []
+    prompt = ""
+
+    if request.method == "POST":
+        prompt = request.form.get("prompt", "")
+        outfit_ids = black_box_matching_function(prompt)
+    session_state["remaining_ids"] = outfit_ids
     return RedirectResponse(url="/select", status_code=303)
