@@ -73,7 +73,7 @@
         {% for item in clothes %}
         <div class="clothing-item">
             <div class="tags">{{ item.id }}</div>
-            <img src="/static/images/{{ item.image_path }}" alt="{{ item.id }}">
+            <img src="/imgs/{{ item.image_path }}" alt="{{ item.id }}">
             <form method="post">
                 <input type="hidden" name="selected_id" value="{{ item.id }}">
                 <button type="submit">Dirty</button>

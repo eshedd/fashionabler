@@ -1,5 +1,7 @@
 .venv/
+**/.DS_Store/**
+**/__pycache__/**
 imgs/*
-old/*
-.DS_Store
-**/.DS_Store
+app/clothes.db
+app/clothes.db-*
+archive

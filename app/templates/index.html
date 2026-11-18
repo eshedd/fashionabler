@@ -10,10 +10,15 @@
 </head>
 <body>
     <h1>My Wardrobe</h1>
+    <nav>
+        <a href="/outfit">Find an outfit by prompt</a> ·
+        <a href="/choose">Filter by questions</a> ·
+        <a href="/select">Laundry and selection</a>
+    </nav>
     <div>
         {% for item in clothes %}
         <div class="clothing-item">
-            <img src="/static/images/{{ item.image_path }}" alt="{{ item.id }}">
+            <img src="/imgs/{{ item.image_path }}" alt="{{ item.id }}">
             <p>{{ item.id }} {{ item.tags }} ({{ item.status }})</p>
         </div>
         {% endfor %}

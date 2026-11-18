@@ -1,62 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Search by Prompt</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Find an outfit</title>
     <style>
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 12px;
-        }
-        .item {
-            width: 120px;
-            height: 160px;
-            overflow: hidden;
-            border-radius: 8px;
-            border: 2px solid #ccc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .item img {
-            width: 100%;
-            height: auto;
-        }
-        body {
-            font-family: sans-serif;
-            margin: 20px;
-        }
-        input[type="text"] {
-            width: 320px;
-            padding: 10px;
-        }
-        button {
-            padding: 10px 16px;
-            margin-left: 10px;
-        }
+        body { font: 16px/1.5 system-ui, sans-serif; max-width: 1100px; margin: 32px auto; padding: 0 18px; color: #20231f; background: #f5f3ee; }
+        nav { margin-bottom: 24px; } nav a { margin-right: 16px; }
+        form { margin: 20px 0; } input { width: min(500px, 65%); padding: 12px; font: inherit; }
+        button { padding: 12px 18px; font: inherit; cursor: pointer; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+        article { background: white; padding: 14px; border-radius: 12px; }
+        .tryon { width: 100%; height: 380px; object-fit: contain; background: #eee; }
+        .garments { display: flex; gap: 12px; } figure { width: 50%; margin: 10px 0 0; text-align: center; }
+        figure img { width: 100%; height: 150px; object-fit: contain; background: #f4f3ef; }
+        figcaption, .score { color: #666; font-size: .9rem; }
+        .error { color: #a22; }
     </style>
 </head>
-
 <body>
-    <h2>Search Clothes via Prompt</h2>
-
-    <form method="POST">
-        <input type="text" name="prompt" placeholder="Describe an outfit..." value="{{ prompt }}">
-        <button type="submit">Run</button>
+    <nav><a href="/">Wardrobe</a><a href="/choose">Filter by questions</a><a href="/select">Laundry</a></nav>
+    <h1>Find an outfit</h1>
+    <form method="post">
+        <input type="text" name="prompt" placeholder="e.g. orange casual summer outfit" value="{{ prompt }}" required>
+        <button type="submit">Search</button>
     </form>
-
-    <hr>
-
-    {% if clothes|length == 0 and prompt != "" %}
-        <p>No matching clothing found.</p>
-    {% endif %}
-
-    <div class="grid">
-        {% for item in clothes %}
-        <div class="item">
-            <img src="/static/images/{{ item.image_path }}" alt="{{ item.id }}">
-        </div>
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+    {% if prompt and not error and not matches %}<p>No saved FastFit outfits matched that prompt and the available clothes.</p>{% endif %}
+    <section class="grid">
+        {% for item in matches %}
+        <article>
+            <img class="tryon" src="{{ item.image_url }}" alt="Try-on outfit {{ item.top_id }} with {{ item.bottom_id }}">
+            <div class="garments">
+                <figure><img src="{{ item.top_image_url }}" alt="{{ item.top_id }}"><figcaption>{{ item.top_id }}</figcaption></figure>
+                <figure><img src="{{ item.bottom_image_url }}" alt="{{ item.bottom_id }}"><figcaption>{{ item.bottom_id }}</figcaption></figure>
+            </div>
+            <p class="score">Prompt match: {{ "%.3f"|format(item.prompt_match) }}</p>
+        </article>
         {% endfor %}
-    </div>
+    </section>
 </body>
 </html>

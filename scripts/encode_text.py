@@ -4,6 +4,10 @@ import json
 import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
+from pathlib import Path
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def encode_text(text):
@@ -15,7 +19,8 @@ def encode_text(text):
 
 def prompt_outfit(prompt):
     text_embed = encode_text(prompt)
-    with open('app/static/metadata.json', 'r') as f:
+    metadata_path = PROJECT_ROOT / 'imgs' / 'metadata.json'
+    with metadata_path.open('r', encoding='utf-8') as f:
         img_embeds = json.load(f)
 
     img_ids = []
@@ -23,7 +28,7 @@ def prompt_outfit(prompt):
     for img_path, data in img_embeds.items():
         img_embed = np.array(data['embedding']).reshape(1, -1)
         similarity = np.dot(text_embed, img_embed.T).squeeze()
-        img_id = int(img_path.split("/")[-1].split("_")[0])
+        img_id = int(Path(img_path).stem.split("_", 1)[0])
         img_ids.append(img_id)
         similarities.append(similarity)
     img_ids, similarities = zip(*sorted(

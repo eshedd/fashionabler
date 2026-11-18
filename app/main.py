@@ -8,14 +8,18 @@ import enum
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 import os
+from pathlib import Path
 from scripts.entropy import next_category
 from scripts.utils import get_available_clothes
-from scripts.encode_text import prompt_outfit
+from scripts import recommend
 
 
-# --- Database setup ---
+# --- Project paths and database setup ---
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+IMAGE_DIR = PROJECT_ROOT / "imgs"
+DATABASE_PATH = Path(__file__).resolve().parent / "clothes.db"
 Base = declarative_base()
-engine = create_engine("sqlite:///app/clothes.db", echo=True)
+engine = create_engine(f"sqlite:///{DATABASE_PATH.as_posix()}", echo=False)
 SessionLocal = sessionmaker(bind=engine)
 
 class StatusEnum(str, enum.Enum):
@@ -30,18 +34,53 @@ class ClothingItem(Base):
     tags = Column(String)
     status = Column(Enum(StatusEnum), default=StatusEnum.clean)
 
-    def __init__(self, image_path, tags="", status=StatusEnum.clean):
+    def __init__(self, image_path, tags="", status=StatusEnum.clean, id=None):
         self.image_path = image_path
-        self.id = int(image_path.split("_")[0])  # numeric prefix
         self.tags = tags
         self.status = status
+        if id is not None:
+            self.id = id
+        else:
+            try:
+                self.id = int(Path(image_path).stem.split("_", 1)[0])
+            except ValueError:
+                # Let SQLite allocate an ID for filenames without a numeric prefix.
+                pass
 
 Base.metadata.create_all(engine)
 
+
+def seed_wardrobe_from_images():
+    """Add indexed imgs/ garments to the local wardrobe database once."""
+    session = SessionLocal()
+    try:
+        for image_path in sorted(IMAGE_DIR.glob("*.jpg")):
+            try:
+                image_id = int(image_path.stem.split("_", 1)[0])
+            except ValueError:
+                continue
+
+            exists = session.query(ClothingItem).filter_by(id=image_id).first()
+            if exists is None:
+                garment_type = image_path.stem.rsplit("_", 1)[-1]
+                session.add(ClothingItem(
+                    id=image_id,
+                    image_path=image_path.name,
+                    tags=f"article_type:{garment_type}",
+                    status=StatusEnum.clean,
+                ))
+        session.commit()
+    finally:
+        session.close()
+
+
+seed_wardrobe_from_images()
+
 # --- FastAPI setup ---
 app = FastAPI()
-templates = Jinja2Templates(directory="app/templates")
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
+app.mount("/imgs", StaticFiles(directory=str(IMAGE_DIR)), name="wardrobe_images")
+app.mount("/fastfit", StaticFiles(directory=str(recommend.FASTFIT_DIR)), name="fastfit_images")
 
 # allow for persistent sessions
 app.add_middleware(SessionMiddleware, secret_key=os.urandom(24))
@@ -53,7 +92,11 @@ def read_clothes(request: Request):
     session = SessionLocal()
     clothes = session.query(ClothingItem).all()
     session.close()
-    return templates.TemplateResponse("index.html", {"request": request, "clothes": clothes})
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={"request": request, "clothes": clothes},
+    )
 
 @app.get("/select", response_class=HTMLResponse)
 def show_candidates(request: Request):
@@ -70,7 +113,11 @@ def show_candidates(request: Request):
         candidates = session.query(ClothingItem).filter(ClothingItem.status == StatusEnum.clean).all()
     session.close()
 
-    return templates.TemplateResponse("select.html", {"request": request, "clothes": candidates})
+    return templates.TemplateResponse(
+        request=request,
+        name="select.html",
+        context={"request": request, "clothes": candidates},
+    )
 
 @app.post("/select")
 def select_clothing(request: Request, selected_id: int = Form(...)):
@@ -108,12 +155,16 @@ def show_question(request: Request):
         if category in article["tags"]:
             options.update(article["tags"][category])
         
-    return templates.TemplateResponse("choose.html", {
-        "request": request,
-        "category": category,
-        "options": options,
-        "remaining_count": remaining_count
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="choose.html",
+        context={
+            "request": request,
+            "category": category,
+            "options": options,
+            "remaining_count": remaining_count,
+        },
+    )
 
 @app.post("/choose")
 def choose_option(request: Request, category: str = Form(...), choice: str = Form(...)):
@@ -174,29 +225,53 @@ def do_laundry():
     session.close()
     return RedirectResponse(url="/select", status_code=303)
 
-@app.route("/outfit", methods=["GET", "POST"])
-async def prompt_search(request: Request):
+_fashion_clip = None
+_garment_embeddings = None
+
+
+@app.api_route("/outfit", methods=["GET", "POST"], response_class=HTMLResponse)
+def prompt_search(request: Request, prompt: str = Form(default="")):
     session_state = request.session.get("filter_state", {})
     remaining_ids = session_state.get("remaining_ids", None)
+    matches = []
+    error = None
 
-    clothes_dicts = get_available_clothes(remaining_ids)
+    if request.method == "POST" and prompt.strip():
+        global _fashion_clip, _garment_embeddings
+        try:
+            image_paths = sorted(
+                path for path in recommend.GARMENT_DIR.iterdir()
+                if path.is_file() and path.suffix.lower() in recommend.IMAGE_EXTENSIONS
+            )
+            if _fashion_clip is None:
+                _fashion_clip = recommend.FashionCLIP("fashion-clip")
+            metadata = recommend.load_metadata()
+            _garment_embeddings = recommend.ensure_image_embeddings(
+                _fashion_clip, metadata, image_paths, rebuild=False
+            )
+            query = recommend.prompt_embedding(_fashion_clip, prompt.strip())
+            matches, _ = recommend.rank_outfits(query, _garment_embeddings, metadata)
 
-    results = []
-    prompt = ""
+            available_stems = {
+                Path(item["image_path"]).stem
+                for item in get_available_clothes(remaining_ids)
+            }
+            matches = [
+                item for item in matches
+                if item["top_id"] in available_stems
+                and item["bottom_id"] in available_stems
+            ][:10]
+            for item in matches:
+                item["image_url"] = f"/fastfit/{item['output_path'].name}"
+                top_image = recommend.GARMENT_DIR / (item["top_id"] + ".jpg")
+                bottom_image = recommend.GARMENT_DIR / (item["bottom_id"] + ".jpg")
+                item["top_image_url"] = f"/imgs/{top_image.relative_to(IMAGE_DIR)}"
+                item["bottom_image_url"] = f"/imgs/{bottom_image.relative_to(IMAGE_DIR)}"
+        except Exception as exc:
+            error = f"Could not search outfits: {exc}"
 
-    outfit_ids = []
-    if request.method == "POST":
-        form = await request.form()
-        prompt = form.get("prompt", "")
-        outfit_ids, outfit_scores = prompt_outfit(prompt)
-        print(outfit_scores)
-        session_state["remaining_ids"] = outfit_ids
-        request.session["filter_state"] = session_state
-        return RedirectResponse(url="/select", status_code=303)
-    else:
-        return templates.TemplateResponse("outfit.html", {
-            "request": request,
-            "prompt": prompt,
-            "results": results,
-            "clothes": clothes_dicts,
-        })
+    return templates.TemplateResponse(
+        request=request,
+        name="outfit.html",
+        context={"request": request, "prompt": prompt, "matches": matches, "error": error},
+    )

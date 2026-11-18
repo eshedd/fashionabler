@@ -1,21 +1,24 @@
-from main import SessionLocal, ClothingItem
+from app.main import SessionLocal, ClothingItem
 import tkinter as tk
 from pathlib import Path
 import shutil
-from tags import ALL_CATEGORIES
+from app.tags import ALL_CATEGORIES
 from PIL import Image, ImageTk
 
 """
 GUI tool to add clothes to the database with manual tagging.
 """
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+IMAGE_DIR = PROJECT_ROOT / "imgs"
+
 def main(session):
     root = tk.Tk()
     root.geometry("1400x800")  # make window bigger
 
     files = Path("~/workspace/data/wardrobe/stage3").expanduser().glob("*.jpg")
-    # only use images not already in static/images
-    files = [p for p in files if not (Path("app/static/images") / p.name).is_file()]
+    # Only add images that are not already in the shared wardrobe image folder.
+    files = [p for p in files if not (IMAGE_DIR / p.name).is_file()]
     clothes = []
     i = 0
     img_obj = None
@@ -62,7 +65,7 @@ def main(session):
     def submit():
         nonlocal i
 
-        img_path = Path("app/static/images") / files[i].name
+        img_path = IMAGE_DIR / files[i].name
         shutil.copy(files[i], img_path)
 
         if corrupted_var.get():

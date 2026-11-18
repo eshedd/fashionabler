@@ -30,3 +30,14 @@ A smart clothing recommender for my fashion-incompetent self built with [Fashion
 - [Outfit Transformer](https://arxiv.org/pdf/2204.04812) ([github](https://github.com/owj0421/outfit-transformer))
 - [VTON Research List 1](https://github.com/minar09/awesome-virtual-try-on?tab=readme-ov-file#Image-based-2D-Virtual-Try-on) and [VTON Research List 2](https://github.com/Zheng-Chong/Awesome-Try-On-Models?tab=readme-ov-file)
 
+## Run the web app
+
+From this directory, install the app dependencies and start Uvicorn:
+
+```sh
+.venv/bin/pip install -r requirements.txt
+.venv/bin/uvicorn app.main:app --reload
+```
+
+Open `http://127.0.0.1:8000`. On first startup, the app adds numbered `imgs/*.jpg` garments to a local SQLite database at `app/clothes.db`. Use **Find an outfit by prompt** to rank saved FastFit renders with FashionCLIP. The first prompt may take longer while the model loads and missing garment embeddings are generated; later searches reuse them. Results include the saved try-on image and the garment images. Laundry status and any active question filter limit which outfits can appear.
+
