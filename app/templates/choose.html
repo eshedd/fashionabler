@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Choose {{ category }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f8f9fa;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 500px;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 28px;
+            color: #333;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .options {
+            margin-top: 25px;
+        }
+
+        button {
+            background: #4A90E2;
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            margin: 8px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        button:hover {
+            background: #357ABD;
+        }
+
+        @media (max-width: 480px) {
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Pick a {{ category | capitalize }}</h1>
+    <div class="subtitle">
+        Remaining items: <strong>{{ remaining_count }}</strong>
+    </div>
+
+    <div class="options">
+        {% for option in options %}
+            <form method="post" style="display:inline-block;">
+                <input type="hidden" name="category" value="{{ category }}">
+                <input type="hidden" name="choice" value="{{ option }}">
+                <button type="submit">{{ option }}</button>
+            </form>
+        {% endfor %}
+    </div>
+    <form method="post" action="/reset" style="margin-top: 30px;">
+        <button type="submit" style="
+            background:#999;
+            border:none;
+            padding:10px 18px;
+            color:white;
+            border-radius:8px;
+            cursor:pointer;
+            font-size:14px;
+        ">🔄 Restart Questions</button>
+    </form>
+</div>
+
+</body>
+</html>
