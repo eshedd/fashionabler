@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fashionabler recommendations</title>
+  <style>
+    :root { color-scheme: light; --ink:#20231f; --muted:#73786f; --paper:#f5f3ee; --card:#fff; --accent:#596b4d; }
+    * { box-sizing:border-box; } body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.45 system-ui,-apple-system,sans-serif; }
+    main { max-width:1280px; margin:auto; padding:36px 22px 60px; }
+    h1 { margin:0 0 8px; font:500 clamp(2rem,5vw,3.4rem)/1.05 Georgia,serif; }
+    .prompt { margin:0 0 6px; font-size:1.2rem; } .meta { color:var(--muted); margin:0 0 28px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr)); gap:20px; }
+    .card { position:relative; background:var(--card); padding:14px; border-radius:14px; box-shadow:0 5px 22px #292b2410; }
+    .rank { position:absolute; top:22px; left:22px; z-index:1; background:#fffE; color:var(--accent); padding:5px 10px; border-radius:99px; font-weight:700; }
+    .tryon { display:block; width:100%; aspect-ratio:3/4; object-fit:contain; background:#eae9e3; border-radius:9px; }
+    .garments { display:flex; gap:12px; margin-top:12px; } figure { width:50%; margin:0; min-width:0; }
+    figure img { display:block; width:100%; height:150px; object-fit:contain; background:#f4f3ef; border-radius:8px; }
+    figcaption { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--muted); font-size:.8rem; margin-top:5px; }
+    .scores { color:var(--muted); font-size:.84rem; margin:12px 2px 2px; }
+  </style>
+</head>
+<body><main>
+  <h1>Wardrobe matches</h1>
+  <p class="prompt">“alien abduction”</p>
+  <p class="meta">Top 8 of 2414 available outfits · ranked by prompt match; pair cohesion breaks ties · 2026-11-17 18:14</p>
+  <section class="grid">
+        <article class="card">
+          <div class="rank">#1</div>
+          <img class="tryon" src="../fastfit_output_50/081_sweatshirt__063_pants.png" alt="Try-on result for 081_sweatshirt and 063_pants">
+          <div class="garments">
+            <figure><img src="../imgs/segmented/081_sweatshirt.jpg" alt="Top 081_sweatshirt"><figcaption>081_sweatshirt</figcaption></figure>
+            <figure><img src="../imgs/segmented/063_pants.jpg" alt="Bottom 063_pants"><figcaption>063_pants</figcaption></figure>
+          </div>
+          <p class="scores">Prompt match 0.136 · Top 0.167 · Bottom 0.105 · Pair cohesion 0.530</p>
+        </article>
+        
+        <article class="card">
+          <div class="rank">#2</div>
+          <img class="tryon" src="../fastfit_output_50/081_sweatshirt__071_pants.png" alt="Try-on result for 081_sweatshirt and 071_pants">
+          <div class="garments">
+            <figure><img src="../imgs/segmented/081_sweatshirt.jpg" alt="Top 081_sweatshirt"><figcaption>081_sweatshirt</figcaption></figure>
+            <figure><img src="../imgs/segmented/071_pants.jpg" alt="Bottom 071_pants"><figcaption>071_pants</figcaption></figure>
+          </div>
+          <p class="scores">Prompt match 0.135 · Top 0.167 · Bottom 0.104 · Pair cohesion 0.560</p>
+        </article>
+        
+        <article class="card">
+          <div class="rank">#3</div>
+          <img class="tryon" src="../fastfit_output_50/085_tshirt__063_pants.png" alt="Try-on result for 085_tshirt and 063_pants">
+          <div class="garments">
+            <figure><img src="../imgs/segmented/085_tshirt.jpg" alt="Top 085_tshirt"><figcaption>085_tshirt</figcaption></figure>
+            <figure><img src="../imgs/segmented/063_pants.jpg" alt="Bottom 063_pants"><figcaption>063_pants</figcaption></figure>
+          </div>
+          <p class="scores">Prompt match 0.133 · Top 0.162 · Bottom 0.105 · Pair cohesion 0.484</p>
+        </article>
+        
+        <article class="card">
+          <div class="rank">#4</div>
+          <img class="tryon" src="../fastfit_output_50/081_sweatshirt__044_pants.png" alt="Try-on result for 081_sweatshirt and 044_pants">
+          <div class="garments">
+            <figure><img src="../imgs/segmented/081_sweatshirt.jpg" alt="Top 081_sweatshirt"><figcaption>081_sweatshirt</figcaption></figure>
+            <figure><img src="../imgs/segmented/044_pants.jpg" alt="Bottom 044_pants"><figcaption>044_pants</figcaption></figure>
+          </div>
+          <p class="scores">Prompt match 0.133 · Top 0.167 · Bottom 0.100 · Pair cohesion 0.496</p>
+        </article>
+        
+        <article class="card">
+          <div class="rank">#5</div>
+          <img class="tryon" src="../fastfit_output_50/085_tshirt__071_pants.png" alt="Try-on result for 085_tshirt and 071_pants">
+          <div class="garments">
+            <figure><img src="../imgs/segmented/085_tshirt.jpg" alt="Top 085_tshirt"><figcaption>085_tshirt</figcaption></figure>
+            <figure><img src="../imgs/segmented/071_pants.jpg" alt="Bottom 071_pants"><figcaption>071_pants</figcaption></figure>
+          </div>
+          <p class="scores">Prompt match 0.133 · Top 0.162 · Bottom 0.104 · Pair cohesion 0.529</p>
+        </article>
+        
+        <article class="card">
+          <div class="rank">#6</div>
+          <img class="tryon" src="../fastfit_output_50/014_tshirt__063_pants.png" alt="Try-on result for 014_tshirt and 063_pants">
+          <div class="garments">
+            <figure><img src="../imgs/segmented/014_tshirt.jpg" alt="Top 014_tshirt"><figcaption>014_tshirt</figcaption></figure>
+            <figure><img src="../imgs/segmented/063_pants.jpg" alt="Bottom 063_pants"><figcaption>063_pants</figcaption></figure>
+          </div>
+          <p class="scores">Prompt match 0.133 · Top 0.160 · Bottom 0.105 · Pair cohesion 0.512</p>
+        </article>
+        
+        <article class="card">
+          <div class="rank">#7</div>
+          <img class="tryon" src="../fastfit_output_50/014_tshirt__071_pants.png" alt="Try-on result for 014_tshirt and 071_pants">
+          <div class="garments">
+            <figure><img src="../imgs/segmented/014_tshirt.jpg" alt="Top 014_tshirt"><figcaption>014_tshirt</figcaption></figure>
+            <figure><img src="../imgs/segmented/071_pants.jpg" alt="Bottom 071_pants"><figcaption>071_pants</figcaption></figure>
+          </div>
+          <p class="scores">Prompt match 0.132 · Top 0.160 · Bottom 0.104 · Pair cohesion 0.552</p>
+        </article>
+        
+        <article class="card">
+          <div class="rank">#8</div>
+          <img class="tryon" src="../fastfit_output_50/019_tshirt__063_pants.png" alt="Try-on result for 019_tshirt and 063_pants">
+          <div class="garments">
+            <figure><img src="../imgs/segmented/019_tshirt.jpg" alt="Top 019_tshirt"><figcaption>019_tshirt</figcaption></figure>
+            <figure><img src="../imgs/segmented/063_pants.jpg" alt="Bottom 063_pants"><figcaption>063_pants</figcaption></figure>
+          </div>
+          <p class="scores">Prompt match 0.132 · Top 0.158 · Bottom 0.105 · Pair cohesion 0.356</p>
+        </article>
+        </section>
+</main></body></html>
